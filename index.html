@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgriYield AI | Smart Farming</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <div class="header-left">
+            <div class="lang-dropdown">
+                <select id="langSelect" onchange="changeLanguage(this.value)">
+                    <option value="en">Language: English</option>
+                    <option value="te">భాష: తెలుగు</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="header-center">
+            <div class="logo"><i class="fas fa-seedling"></i> AgriYield AI</div>
+            <p id="subtitle_header" class="trans" data-en="Ultimate Decision Support System" data-te="అల్టిమేట్ డిసిషన్ సపోర్ట్ సిస్టమ్">Ultimate Decision Support System</p>
+        </div>
+        
+        <div class="header-right">
+            <div id="auth_buttons">
+                <button class="btn-auth" onclick="openModal('loginModal')">Login</button>
+                <button class="btn-auth" onclick="openModal('registerModal')">Register</button>
+            </div>
+            <div id="user_section" style="display:none;">
+                <span id="username_display" style="color:#00f3ff; margin-right:10px;"></span>
+                <a href="/logout" class="btn-auth" style="text-decoration:none; color:#ff4d4d;">Logout</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        
+        <!-- FORM CARD -->
+        <div class="form-card">
+            <h2><i class="fas fa-brain"></i> <span class="trans" data-en="Analyze Your Farm" data-te="మీ పొలాన్ని విశ్లేషించండి">Analyze Your Farm</span></h2>
+            <p class="subtitle"><span class="trans" data-en="Enter parameters or use Voice/Weather assistants" data-te="వివరాలు నమోదు చేయండి లేదా వాయిస్/వాతావరణం ఉపయోగించండి">Enter parameters or use Voice/Weather assistants</span></p>
+
+            <div class="weather-section">
+                <input type="text" id="cityInput" placeholder="Enter City (e.g., Hyderabad)">
+                <button type="button" class="btn-weather" onclick="fetchWeather()"><i class="fas fa-cloud-sun"></i> Fetch Weather</button>
+            </div>
+
+            <form id="predictForm">
+                <div class="form-grid">
+                    <div class="input-group"><label><i class="fas fa-leaf"></i> <span class="trans" data-en="Crop" data-te="పంట">Crop</span></label><select id="Crop" required><option value="Maize">Maize</option><option value="Wheat">Wheat</option><option value="Rice">Rice</option><option value="Barley">Barley</option></select></div>
+                    <div class="input-group"><label><i class="fas fa-map-marker-alt"></i> <span class="trans" data-en="Region" data-te="ప్రాంతం">Region</span></label><select id="Region" required><option value="Region_A">Region A</option><option value="Region_B">Region B</option><option value="Region_C">Region C</option><option value="Region_D">Region D</option></select></div>
+                    <div class="input-group"><label><i class="fas fa-mountain"></i> <span class="trans" data-en="Soil Type" data-te="నేల రకం">Soil Type</span></label><select id="Soil_Type" required><option value="Sandy">Sandy</option><option value="Clay">Clay</option><option value="Loam">Loam</option></select></div>
+                    <div class="input-group"><label><i class="fas fa-flask"></i> Soil pH</label><input type="number" id="Soil_pH" step="0.1" value="6.5" required></div>
+                    <div class="input-group"><label><i class="fas fa-cloud-rain"></i> <span class="trans" data-en="Rainfall (mm)" data-te="వర్షపాతం">Rainfall (mm)</span></label><input type="number" id="Rainfall_mm" step="1" value="800" required></div>
+                    <div class="input-group"><label><i class="fas fa-thermometer-half"></i> <span class="trans" data-en="Temp (°C)" data-te="ఉష్ణోగ్రత">Temp (°C)</span></label><input type="number" id="Temperature_C" step="0.1" value="25" required></div>
+                    <div class="input-group"><label><i class="fas fa-tint"></i> <span class="trans" data-en="Humidity (%)" data-te="తేమ">Humidity (%)</span></label><input type="number" id="Humidity_pct" step="1" value="60" required></div>
+                    <div class="input-group"><label><i class="fas fa-recycle"></i> <span class="trans" data-en="Fertilizer (kg)" data-te="ఎరువులు">Fertilizer (kg)</span></label><input type="number" id="Fertilizer_Used_kg" step="1" value="150" required></div>
+                    <div class="input-group"><label><i class="fas fa-bug"></i> <span class="trans" data-en="Pesticides (kg)" data-te="పురుగుమందులు">Pesticides (kg)</span></label><input type="number" id="Pesticides_Used_kg" step="1" value="20" required></div>
+                    <div class="input-group"><label><i class="fas fa-th"></i> <span class="trans" data-en="Plant Density" data-te="మొక్కల సాంద్రత">Plant Density</span></label><input type="number" id="Planting_Density" step="0.1" value="15" required></div>
+                    <div class="input-group"><label><i class="fas fa-shower"></i> <span class="trans" data-en="Irrigation" data-te="నీటిపారుదల">Irrigation</span></label><select id="Irrigation" required><option value="Drip">Drip</option><option value="Sprinkler">Sprinkler</option><option value="Flood">Flood</option><option value="None">None</option></select></div>
+                    <div class="input-group"><label><i class="fas fa-history"></i> <span class="trans" data-en="Prev Crop" data-te="గత పంట">Prev Crop</span></label><select id="Previous_Crop" required><option value="None">None</option><option value="Maize">Maize</option><option value="Wheat">Wheat</option><option value="Rice">Rice</option><option value="Barley">Barley</option></select></div>
+                </div>
+                <button type="submit" id="predictBtn"><i class="fas fa-rocket"></i> <span class="trans" data-en="Run AI Analysis" data-te="AI విశ్లేషణ">Run AI Analysis</span></button>
+            </form>
+        </div>
+
+        <!-- RESULT CARD -->
+        <div class="result-card" id="resultCard" style="display: none;">
+            <h3><i class="fas fa-chart-line"></i> <span class="trans" data-en="Predicted Harvest" data-te="అంచనా దిగుబడి">Predicted Harvest</span></h3>
+            <div class="result-value"><span id="yieldValue">0.00</span><span class="unit">tons / hectare</span></div>
+            <button type="button" class="btn-pdf" onclick="generatePDF()"><i class="fas fa-file-pdf"></i> <span class="trans" data-en="Download Report" data-te="నివేదిక">Download Report</span></button>
+        </div>
+
+        <!-- RECOMMENDATION CARD -->
+        <div class="form-card" id="recommendCard" style="display: none; margin-top: 2rem; border-color: #ffcc00;">
+            <h3><i class="fas fa-crown"></i> <span class="trans" data-en="AI Crop Recommendation" data-te="AI పంట సిఫార్సు">AI Crop Recommendation</span></h3>
+            <p class="subtitle" id="recommendText" style="color: #ffcc00; font-weight: bold;"></p>
+            <div style="display: flex; justify-content: space-around; margin-top: 1.5rem; flex-wrap: wrap;">
+                <div class="crop-box" id="box_Maize"><div class="crop-name">Maize</div><div class="crop-yield" id="yield_Maize">0</div><div class="crop-unit">t/ha</div></div>
+                <div class="crop-box" id="box_Wheat"><div class="crop-name">Wheat</div><div class="crop-yield" id="yield_Wheat">0</div><div class="crop-unit">t/ha</div></div>
+                <div class="crop-box" id="box_Rice"><div class="crop-name">Rice</div><div class="crop-yield" id="yield_Rice">0</div><div class="crop-unit">t/ha</div></div>
+                <div class="crop-box" id="box_Barley"><div class="crop-name">Barley</div><div class="crop-yield" id="yield_Barley">0</div><div class="crop-unit">t/ha</div></div>
+            </div>
+        </div>
+
+        <!-- GRAPH CARD -->
+        <div class="form-card" id="graphCard" style="display: none; margin-top: 2rem;">
+            <h3><i class="fas fa-chart-area"></i> Fertilizer vs Yield</h3>
+            <canvas id="yieldChart" style="max-height: 300px;"></canvas>
+        </div>
+
+        <!-- EXPLAINABLE AI CARD -->
+        <div class="form-card" id="explainCard" style="display: none; margin-top: 2rem; border-color: #00f3ff;">
+            <h3><i class="fas fa-robot"></i> <span class="trans" data-en="AI Explanation" data-te="AI వివరణ">AI Explanation</span></h3>
+            <div id="explainText" class="explain-text-box"></div>
+        </div>
+
+        <!-- HISTORY -->
+        <div class="form-card" style="margin-top: 2rem;">
+            <div class="history-header">
+                <h3><i class="fas fa-database"></i> <span class="trans" data-en="Session History" data-te="చరిత్ర">Session History</span></h3>
+                <button id="deleteHistoryBtn" class="btn-delete-history" onclick="deleteHistory()" style="display:none;">
+                    <i class="fas fa-trash"></i> <span class="trans" data-en="Clear History" data-te="చరిత్ర తొలగించు">Clear History</span>
+                </button>
+            </div>
+            <table class="history-table"><thead><tr><th>Crop</th><th>Region</th><th>Yield</th></tr></thead><tbody id="historyBody"><tr><td colspan="3">No history</td></tr></tbody></table>
+        </div>
+    </div>
+
+    <!-- VOICE BTN -->
+    <button class="voice-btn" onclick="startVoiceInput()" id="voiceBtn" title="Voice Input (Use Chrome)"><i class="fas fa-microphone"></i></button>
+
+    <!-- AUTH MODALS -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <h3 style="color:#00ff88; margin-bottom:1rem;">Login</h3>
+            <input type="text" id="login_user" placeholder="Username" class="modal-input"><br>
+            <input type="password" id="login_pass" placeholder="Password" class="modal-input"><br>
+            <button class="btn-auth-submit" onclick="handleLogin()">Login</button>
+            <button class="btn-auth-cancel" onclick="closeModal('loginModal')">Cancel</button>
+        </div>
+    </div>
+    
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <h3 style="color:#00f3ff; margin-bottom:1rem;">Register</h3>
+            <input type="text" id="reg_user" placeholder="Choose Username" class="modal-input"><br>
+            <input type="password" id="reg_pass" placeholder="Choose Password" class="modal-input"><br>
+            <button class="btn-auth-submit" onclick="handleRegister()">Register</button>
+            <button class="btn-auth-cancel" onclick="closeModal('registerModal')">Cancel</button>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT - FULLY UN-MINIFIED AND BUG FIXED -->
+    <script>
+        let yieldChartInstance = null; 
+        let latestResult = {}; 
+        let currentLang = 'en'; 
+
+        window.onload = checkLoginStatus;
+
+        // --- LANGUAGE ---
+        function changeLanguage(lang) { 
+            currentLang = lang; 
+            document.querySelectorAll('.trans').forEach(el => { 
+                el.innerText = el.getAttribute('data-' + currentLang); 
+            }); 
+            if(latestResult.explainability) {
+                generateExplanationText(latestResult.explainability); 
+            }
+        }
+
+        // --- WEATHER ---
+        async function fetchWeather() { 
+            const city = document.getElementById('cityInput').value; 
+            if(!city) { alert("Please enter a city name"); return; } 
+            try { 
+                const res = await fetch('/get_weather', { 
+                    method: 'POST', 
+                    headers: {'Content-Type':'application/json'}, 
+                    body: JSON.stringify({city: city}) 
+                }); 
+                const data = await res.json(); 
+                if(data.status === 'success') { 
+                    document.getElementById('Temperature_C').value = data.temp; 
+                    document.getElementById('Humidity_pct').value = data.humidity; 
+                    document.getElementById('Rainfall_mm').value = data.rainfall; 
+                    alert("Live weather fetched!"); 
+                } else { 
+                    alert(data.msg); 
+                } 
+            } catch(e) { 
+                alert("Failed to fetch weather"); 
+            } 
+        }
+
+        // --- VOICE ---
+        function startVoiceInput() { 
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition; 
+            if (!SpeechRecognition) { 
+                alert("Voice Input only works on Google Chrome browser!"); 
+                return; 
+            } 
+            const recognition = new SpeechRecognition(); 
+            recognition.lang = 'en-IN'; 
+            recognition.interimResults = false; 
+            const voiceBtn = document.getElementById('voiceBtn'); 
+            voiceBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i>'; 
+            voiceBtn.style.color = '#ff4d4d'; 
+
+            recognition.onresult = function(event) { 
+                const transcript = event.results[0][0].transcript.toLowerCase(); 
+                voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>'; 
+                voiceBtn.style.color = '#00ff88'; 
+
+                if(transcript.includes('rice')) document.getElementById('Crop').value = 'Rice'; 
+                else if(transcript.includes('wheat')) document.getElementById('Crop').value = 'Wheat'; 
+                else if(transcript.includes('maize')) document.getElementById('Crop').value = 'Maize'; 
+                else if(transcript.includes('barley')) document.getElementById('Crop').value = 'Barley'; 
+
+                const numbers = transcript.match(/\d+(\.\d+)?/g); 
+                if(numbers && numbers.length > 0) { 
+                    if(transcript.includes('temp')) document.getElementById('Temperature_C').value = numbers[0]; 
+                    else if(transcript.includes('rain')) document.getElementById('Rainfall_mm').value = numbers[0]; 
+                    else if(transcript.includes('ph')) document.getElementById('Soil_pH').value = numbers[0]; 
+                    else if(transcript.includes('fertilizer')) document.getElementById('Fertilizer_Used_kg').value = numbers[0]; 
+                } 
+                alert("Heard: " + transcript + "\nForm updated!"); 
+            }; 
+
+            recognition.onerror = function(event) { 
+                voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>'; 
+                voiceBtn.style.color = '#00ff88'; 
+                if(event.error === 'not-allowed') alert("Mic permission denied!"); 
+                else alert("Voice error: " + event.error); 
+            }; 
+
+            recognition.start(); 
+        }
+
+        // --- EXPLAINABLE AI ---
+        function generateExplanationText(expData) { 
+            const explainDiv = document.getElementById('explainText'); 
+            if (!expData || expData.length === 0) { 
+                explainDiv.innerHTML = "No explanation available."; 
+                return; 
+            } 
+            const topFeatures = expData.slice(0, 3); 
+
+            let sentenceEn = '<i class="fas fa-brain"></i> The AI predicted this yield primarily based on '; 
+            let sentenceTe = '<i class="fas fa-brain"></i> AI ఈ దిగుబడిని ప్రధానంగా '; 
+
+            const featureNamesEn = topFeatures.map((item) => { 
+                let name = item.feature; 
+                if(name === 'Density') name = 'Planting Density'; 
+                if(name === 'Used') name = 'Fertilizer Used'; 
+                if(name === 'mm') name = 'Rainfall'; 
+                if(name === 'C') name = 'Temperature'; 
+                return '<span style="color:#00f3ff; font-weight:bold;">' + name + ' (' + item.importance + '%)</span>'; 
+            }); 
+
+            const featureNamesTe = topFeatures.map((item) => { 
+                let name = item.feature; 
+                if(name === 'Density') name = 'మొక్కల సాంద్రత'; 
+                if(name === 'Used') name = 'ఎరువులు'; 
+                if(name === 'mm') name = 'వర్షపాతం'; 
+                if(name === 'C') name = 'ఉష్ణోగ్రత'; 
+                return '<span style="color:#00f3ff; font-weight:bold;">' + name + ' (' + item.importance + '%)</span>'; 
+            }); 
+
+            sentenceEn += featureNamesEn.join(', ') + '. These factors had the highest impact on your crop output.'; 
+            sentenceTe += featureNamesTe.join(', ') + ' అంశలపై ఆధారపడి అంచనా వేసింది.'; 
+
+            if(latestResult.selected_crop !== latestResult.best_crop) { 
+                sentenceEn += '<br><br><i class="fas fa-lightbulb" style="color:#ffcc00;"></i> <span style="color:#ffcc00;">AI Tip:</span> Consider switching to <strong>' + latestResult.best_crop + '</strong> for higher profits!'; 
+                sentenceTe += '<br><br><i class="fas fa-lightbulb" style="color:#ffcc00;"></i> <span style="color:#ffcc00;">AI సలహా:</span> ఎక్కువ లాభాల కోసం <strong>' + latestResult.best_crop + '</strong> పంటకు మార్చండి!'; 
+            } 
+
+            explainDiv.innerHTML = currentLang === 'te' ? sentenceTe : sentenceEn; 
+        }
+
+        // --- AUTH LOGIC ---
+        function openModal(id) { 
+            document.getElementById(id).style.display = 'flex'; 
+        } 
+
+        function closeModal(id) { 
+            document.getElementById(id).style.display = 'none'; 
+        }
+
+        async function handleRegister() { 
+            const u = document.getElementById('reg_user').value; 
+            const p = document.getElementById('reg_pass').value; 
+            const res = await fetch('/register', { 
+                method: 'POST', 
+                headers: {'Content-Type': 'application/json'}, 
+                body: JSON.stringify({username: u, password: p}) 
+            }); 
+            const data = await res.json(); 
+            alert(data.msg); 
+            if(data.status === 'success') {
+                closeModal('registerModal');
+            } 
+        }
+
+        async function handleLogin() { 
+            const u = document.getElementById('login_user').value; 
+            const p = document.getElementById('login_pass').value; 
+            const res = await fetch('/login', { 
+                method: 'POST', 
+                headers: {'Content-Type': 'application/json'}, 
+                body: JSON.stringify({username: u, password: p}) 
+            }); 
+            const data = await res.json(); 
+            if(data.status === 'success') { 
+                checkLoginStatus(); 
+                closeModal('loginModal'); 
+            } else { 
+                alert(data.msg); 
+            } 
+        }
+
+        async function checkLoginStatus() { 
+            try { 
+                const authRes = await fetch('/check_auth'); 
+                const authData = await authRes.json(); 
+                if(authData.logged_in) { 
+                    document.getElementById('auth_buttons').style.display = 'none'; 
+                    document.getElementById('user_section').style.display = 'flex'; 
+                    document.getElementById('username_display').innerText = authData.username; 
+                    document.getElementById('deleteHistoryBtn').style.display = 'inline-block'; 
+                    const res = await fetch('/get_history'); 
+                    const history = await res.json(); 
+                    loadDBHistory(history); 
+                } else { 
+                    document.getElementById('auth_buttons').style.display = 'flex'; 
+                    document.getElementById('user_section').style.display = 'none'; 
+                    document.getElementById('deleteHistoryBtn').style.display = 'none'; 
+                    document.getElementById('historyBody').innerHTML = '<tr><td colspan="3">Login to save history</td></tr>'; 
+                } 
+            } catch(e) { 
+                console.error("Auth check error", e); 
+            } 
+        }
+
+        function loadDBHistory(history) { 
+            const tbody = document.getElementById('historyBody'); 
+            tbody.innerHTML = ''; 
+            if (!history.length) { 
+                tbody.innerHTML = '<tr><td colspan="3">No history yet</td></tr>'; 
+                return; 
+            } 
+            history.forEach(item => { 
+                tbody.innerHTML += '<tr><td>' + item.crop + '</td><td>' + item.region + '</td><td style="color:#00ff88;">' + item.yield + ' t/ha</td></tr>'; 
+            }); 
+        }
+
+        // --- DELETE HISTORY ---
+        async function deleteHistory() { 
+            if(confirm("Are you sure you want to delete all prediction history?")) { 
+                const res = await fetch('/delete_history', { method: 'POST' }); 
+                const data = await res.json(); 
+                if(data.status === 'success') { 
+                    loadDBHistory([]); 
+                    alert(data.msg); 
+                } else { 
+                    alert(data.msg); 
+                } 
+            } 
+        }
+
+        // --- PREDICTION LOGIC ---
+        document.getElementById('predictForm').addEventListener('submit', async function(e) {
+            e.preventDefault(); 
+
+            const btn = document.getElementById('predictBtn'); 
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...'; 
+            btn.disabled = true;
+
+            const formData = { 
+                Crop: document.getElementById('Crop').value, 
+                Region: document.getElementById('Region').value, 
+                Soil_Type: document.getElementById('Soil_Type').value, 
+                Soil_pH: document.getElementById('Soil_pH').value, 
+                Rainfall_mm: document.getElementById('Rainfall_mm').value, 
+                Temperature_C: document.getElementById('Temperature_C').value, 
+                Humidity_pct: document.getElementById('Humidity_pct').value, 
+                Fertilizer_Used_kg: document.getElementById('Fertilizer_Used_kg').value, 
+                Pesticides_Used_kg: document.getElementById('Pesticides_Used_kg').value, 
+                Planting_Density: document.getElementById('Planting_Density').value, 
+                Irrigation: document.getElementById('Irrigation').value, 
+                Previous_Crop: document.getElementById('Previous_Crop').value 
+            };
+
+            try {
+                const response = await fetch('/predict', { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify(formData) 
+                }); 
+
+                const result = await response.json();
+
+                if (result.status === 'success') { 
+                    latestResult = result; 
+                    latestResult.inputs = formData; 
+
+                    document.getElementById('resultCard').style.display = 'block'; 
+                    animateValue('yieldValue', 0, result.prediction, 1500); 
+
+                    document.getElementById('recommendCard').style.display = 'block'; 
+                    updateRecommendations(result.crop_recommendations, result.best_crop, result.selected_crop); 
+
+                    document.getElementById('graphCard').style.display = 'block'; 
+                    renderGraph(result.graph_data); 
+
+                    document.getElementById('explainCard').style.display = 'block'; 
+                    generateExplanationText(result.explainability); 
+
+                    checkLoginStatus(); 
+                } else { 
+                    alert("Error from Server: " + result.message); 
+                }
+            } catch(e) { 
+                console.error("Fetch Error:", e);
+                alert("Failed to connect to server. Check console (F12)."); 
+            } finally {
+                const langSpan = currentLang === 'te' ? 'AI విశ్లేషణ' : 'Run AI Analysis';
+                btn.innerHTML = '<i class="fas fa-rocket"></i> <span class="trans" data-en="Run AI Analysis" data-te="AI విశ్లేషణ">' + langSpan + '</span>'; 
+                btn.disabled = false;
+            }
+        });
+
+        function updateRecommendations(cropYields, bestCrop, selectedCrop) { 
+            const recommendText = document.getElementById('recommendText'); 
+            if(selectedCrop === bestCrop) {
+                recommendText.innerHTML = '<i class="fas fa-check-circle"></i> Great choice! ' + bestCrop + ' gives the highest yield.'; 
+            } else {
+                recommendText.innerHTML = '<i class="fas fa-exclamation-circle"></i> Consider changing to ' + bestCrop + '. It yields significantly more.'; 
+            }
+            
+            const crops = ['Maize', 'Wheat', 'Rice', 'Barley'];
+            crops.forEach(crop => { 
+                document.getElementById('yield_' + crop).innerText = cropYields[crop]; 
+                const box = document.getElementById('box_' + crop); 
+                if(crop === bestCrop) {
+                    box.style.borderColor = '#00ff88'; 
+                    box.style.boxShadow = '0 0 15px rgba(0,255,136,0.5)';
+                } else if(crop === selectedCrop) {
+                    box.style.borderColor = '#00f3ff'; 
+                    box.style.boxShadow = 'none';
+                } else {
+                    box.style.borderColor = 'rgba(255,255,255,0.1)'; 
+                    box.style.boxShadow = 'none';
+                }
+            }); 
+        }
+
+        function renderGraph(graphData) { 
+            const ctx = document.getElementById('yieldChart').getContext('2d'); 
+            if(yieldChartInstance) yieldChartInstance.destroy(); 
+            yieldChartInstance = new Chart(ctx, { 
+                type: 'line', 
+                data: { 
+                    labels: graphData.fertilizer, 
+                    datasets: [{ 
+                        label: 'Yield', 
+                        data: graphData.yield, 
+                        borderColor: '#00ff88', 
+                        backgroundColor: 'rgba(0,255,136,0.1)', 
+                        fill: true, 
+                        tension: 0.4 
+                    }] 
+                }, 
+                options: { 
+                    scales: { 
+                        x: { ticks: {color:'#6b8f78'}, grid: {color:'rgba(0,255,136,0.1)'} }, 
+                        y: { ticks: {color:'#6b8f78'}, grid: {color:'rgba(0,255,136,0.1)'} } 
+                    } 
+                } 
+            }); 
+        }
+
+        function generatePDF() { 
+            const { jsPDF } = window.jspdf; 
+            const doc = new jsPDF(); 
+            doc.setFillColor(0,20,10); 
+            doc.rect(0,0,210,297,'F'); 
+            doc.setTextColor(0,255,136); 
+            doc.setFontSize(24); 
+            doc.text("AgriYield AI - Farm Report", 20, 30); 
+            doc.setTextColor(0,243,255); 
+            doc.setFontSize(14); 
+            doc.text("Crop: " + latestResult.inputs.Crop, 20, 50); 
+            doc.text("Region: " + latestResult.inputs.Region, 20, 60); 
+            doc.setTextColor(255,255,255); 
+            doc.setFontSize(18); 
+            doc.text("Predicted Yield: " + latestResult.prediction + " t/ha", 20, 90); 
+            doc.setTextColor(255,204,0); 
+            doc.text("AI Recommended Best Crop: " + latestResult.best_crop, 20, 110); 
+            doc.save("AgriYield_Report.pdf"); 
+        }
+
+        function animateValue(id, start, end, duration) { 
+            const obj = document.getElementById(id);
+            if (start === end || duration <= 0) {
+                obj.innerHTML = end.toFixed(2);
+                return;
+            }
+            
+            let range = end - start; 
+            let current = start; 
+            let increment = end > start ? 0.1 : -0.1; 
+            let stepTime = Math.abs(Math.floor(duration / Math.abs(range))); 
+            stepTime = Math.max(stepTime, 10); 
+
+            let timer = setInterval(function() { 
+                current += increment; 
+                current = Math.round(current * 100) / 100; 
+                obj.innerHTML = current.toFixed(2); 
+                
+                if ((increment > 0 && current >= end) || (increment < 0 && current <= end)) { 
+                    obj.innerHTML = end.toFixed(2); 
+                    clearInterval(timer); 
+                } 
+            }, stepTime); 
+        }
+    </script>
+</body>
+</html>
