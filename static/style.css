@@ -1,0 +1,133 @@
+/* =========================================
+   SIMPLE & FARMER-FRIENDLY AGRITECH THEME
+   ========================================= */
+
+:root {
+    --bg-main: #f4f9f4;         /* పచ్చిక లాంటి తెలుపు నేపథ్యం */
+    --bg-card: #ffffff;         /* తెల్లని కార్డులు */
+    --primary-green: #2e7d32;   /* పంట పచ్చరంగు */
+    --primary-light: #e8f5e9;   /* లేత పచ్చ నేపథ్యం */
+    --accent-golden: #f9a825;   /* పంటకాయ/ధాన్యం రంగు */
+    --text-dark: #2c3e50;       /* చదవడానికి సులభమైన నలుపు */
+    --text-muted: #666666;      /* సెకండరీ టెక్స్ట్ */
+    --border-light: #dcdcdc;    /* సన్నని బోర్డర్లు */
+    --input-bg: #f9f9f9;        /* ఇన్‌పుట్ బాక్స్ నేపథ్యం */
+    --shadow-soft: 0 4px 15px rgba(0, 0, 0, 0.08); /* మెత్తని నీడ */
+    --radius-md: 12px;          /* గుండ్రని అంచులు */
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; }
+body {
+    background-color: #e8f5e9; /* ఇది ఫోటో లోడ్ అయ్యే వరకు కనిపించే కలర్ */
+    background-image: url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=2070&auto=format&fit=crop');
+    background-size: cover;
+    background-position: center center;
+    background-attachment: fixed; /* స్క్రోల్ చేసినప్పుడు బ్యాక్‌గ్రౌండ్ కదలకుండా ఉంటుంది */
+    color: var(--text-dark);
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* ఫోటో బ్రైట్‌గా ఉంటే టెక్స్ట్ కనిపించడానికి వీలుగా పేజీ మొత్తం మీద ఒక లైట్ వైట్ లేయర్ (Overlay) వేశాం */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.75); /* 75% వైట్ షేడో */
+    z-index: -1;
+}
+/* డార్క్ థీమ్ గ్రిడ్ యానిమేషన్ పూర్తిగా తొలగించబడింది */
+
+::-webkit-scrollbar { width: 8px; } 
+::-webkit-scrollbar-track { background: var(--bg-main); } 
+::-webkit-scrollbar-thumb { background: var(--primary-green); border-radius: 4px; }
+
+/* HEADER */
+header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; background: var(--bg-card); border-bottom: 2px solid var(--primary-green); box-shadow: var(--shadow-soft); flex-wrap: wrap; gap: 15px; }
+.header-left { flex: 1; min-width: 150px; }
+.header-center { flex: 2; text-align: center; min-width: 250px; }
+.header-right { flex: 1; display: flex; justify-content: flex-end; align-items: center; gap: 10px; min-width: 200px; }
+
+header .logo { font-size: 2rem; font-weight: 800; color: var(--primary-green); text-transform: uppercase; letter-spacing: 1px; }
+/* టెక్స్ట్ ఫ్లికర్ యానిమేషన్ తొలగించబడింది */
+header p { color: var(--text-muted); font-size: 0.95rem; margin-top: 5px; letter-spacing: 0.5px; }
+
+.lang-dropdown select { background: var(--input-bg); color: var(--text-dark); border: 1px solid var(--border-light); padding: 8px 12px; font-family: inherit; outline: none; cursor: pointer; font-size: 0.9rem; border-radius: var(--radius-md); }
+.lang-dropdown select option { background: var(--bg-card); color: var(--text-dark); }
+
+.btn-auth { background: var(--primary-light); border: 1px solid var(--primary-green); color: var(--primary-green); padding: 8px 20px; cursor: pointer; font-family: inherit; font-size: 0.9rem; border-radius: var(--radius-md); text-decoration: none; white-space: nowrap; font-weight: 600; transition: all 0.2s ease; }
+.btn-auth:hover { background: var(--primary-green); color: #fff; }
+
+.container { max-width: 1200px; margin: 0 auto; padding: 3rem 20px; }
+.form-card, .result-card { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 2.5rem; position: relative; overflow: hidden; box-shadow: var(--shadow-soft); transition: all 0.3s ease; }
+
+/* స్కాన్ లైన్ యానిమేషన్ తొలగించబడింది */
+
+.form-card:hover, .result-card:hover { box-shadow: 0 8px 25px rgba(46, 125, 50, 0.15); border-color: var(--primary-green); }
+.form-card h2, .form-card h3, .result-card h3 { color: var(--primary-green); text-align: center; margin-bottom: 0.5rem; font-size: 1.8rem; text-transform: none; letter-spacing: 0.5px; font-weight: 700; }
+.form-card h2 i, .form-card h3 i, .result-card h3 i { color: var(--accent-golden); margin-right: 10px; }
+.subtitle { text-align: center; margin-bottom: 2rem; color: var(--text-muted); font-size: 1rem; }
+
+.weather-section { display: flex; gap: 10px; margin-bottom: 20px; }
+.weather-section input { flex: 1; padding: 12px; background: var(--input-bg); border: 1px solid var(--border-light); color: var(--text-dark); font-family: inherit; outline: none; border-radius: var(--radius-md); font-size: 1rem; transition: border-color 0.2s; }
+.weather-section input:focus { border-color: var(--primary-green); }
+.btn-weather { background: var(--primary-green); border: none; color: #fff; padding: 12px 20px; cursor: pointer; font-family: inherit; font-size: 1rem; white-space: nowrap; max-width: none; letter-spacing: 0; margin: 0; border-radius: var(--radius-md); font-weight: 600; transition: opacity 0.2s; }
+.btn-weather:hover { opacity: 0.9; }
+
+.form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; }
+.input-group { display: flex; flex-direction: column; }
+.input-group label { margin-bottom: 0.5rem; font-weight: 600; color: var(--text-dark); font-size: 0.95rem; }
+.input-group label i { margin-right: 5px; color: var(--primary-green); }
+.input-group input, .input-group select { padding: 14px 16px; border: 1px solid var(--border-light); border-radius: var(--radius-md); background: var(--input-bg); color: var(--text-dark); font-size: 1rem; font-family: inherit; outline: none; transition: all 0.2s ease; }
+.input-group input:focus, .input-group select:focus { border-color: var(--primary-green); background: #fff; box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.1); }
+.input-group select option { background: var(--bg-card); color: var(--text-dark); }
+
+button { display: block; width: 100%; max-width: 500px; margin: 2.5rem auto 0; padding: 16px 30px; font-size: 1.2rem; font-weight: 700; letter-spacing: 0.5px; border: none; border-radius: var(--radius-md); background: var(--primary-green); color: #fff; cursor: pointer; text-transform: uppercase; position: relative; overflow: hidden; transition: all 0.2s ease; box-shadow: 0 4px 10px rgba(46, 125, 50, 0.3); }
+/* బటన్ పల్స్ యానిమేషన్ తొలగించబడింది */
+button:hover { background: #1b5e20; box-shadow: 0 6px 15px rgba(46, 125, 50, 0.4); transform: translateY(-2px); }
+button:active { transform: translateY(0); }
+button:disabled { opacity: 0.5; cursor: not-allowed; background: #a5d6a7; box-shadow: none; transform: none; }
+
+.result-card { margin-top: 3rem; text-align: center; display: none; border-top: 4px solid var(--primary-green); }
+.pop-in { animation: simpleReveal 0.5s ease forwards; }
+@keyframes simpleReveal { 0% { transform: translateY(20px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+
+.result-value { font-size: 4rem; font-weight: 800; color: var(--primary-green); margin: 1.5rem 0; filter: none; background: none; -webkit-background-clip: unset; background-clip: unset; -webkit-text-fill-color: unset; }
+.result-value .unit { font-size: 1.2rem; color: var(--text-muted); display: block; font-weight: 500; -webkit-text-fill-color: var(--text-muted); margin-top: 10px; }
+
+.btn-pdf { border: 2px solid #e53935; color: #e53935; background: transparent; padding: 10px 20px; font-size: 1rem; border-radius: var(--radius-md); margin-top: 1.5rem; max-width: 250px; letter-spacing: 0.5px; font-weight: 600; box-shadow: none; text-transform: none; }
+.btn-pdf:hover { background: #e53935; color: #fff; box-shadow: 0 4px 10px rgba(229, 57, 53, 0.3); }
+
+.crop-box { background: var(--primary-light); border: 1px solid #c8e6c9; border-radius: var(--radius-md); padding: 15px 25px; text-align: center; min-width: 120px; transition: all 0.2s ease; }
+.crop-name { color: var(--text-muted); font-size: 1rem; font-weight: 500; text-transform: capitalize; }
+.crop-yield { color: var(--primary-green); font-size: 2rem; font-weight: 800; margin: 5px 0; }
+.crop-unit { color: var(--text-muted); font-size: 0.9rem; }
+
+.explain-text-box { background: #fff8e1; border-left: 4px solid var(--accent-golden); padding: 20px; margin-top: 1.5rem; font-size: 1rem; line-height: 1.7; color: var(--text-dark); text-align: left; border-radius: 0 var(--radius-md) var(--radius-md) 0; }
+
+.history-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+.btn-delete-history { background: transparent; border: 1px solid #e53935; color: #e53935; padding: 8px 20px; font-size: 0.9rem; cursor: pointer; font-family: inherit; max-width: none; letter-spacing: 0; margin: 0; border-radius: var(--radius-md); font-weight: 600; transition: all 0.2s; }
+.btn-delete-history:hover { background: #e53935; color: #fff; }
+
+.history-table { width: 100%; border-collapse: collapse; text-align: center; }
+.history-table th, .history-table td { padding: 12px 15px; border: 1px solid var(--border-light); }
+.history-table th { background-color: var(--primary-light); color: var(--primary-green); text-transform: capitalize; font-size: 0.95rem; font-weight: 600; }
+.history-table tr:nth-child(even) { background-color: #fafafa; }
+.history-table tr:hover { background-color: var(--primary-light); }
+
+.voice-btn { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; border-radius: 50%; background: var(--primary-green); border: none; color: #fff; font-size: 24px; cursor: pointer; box-shadow: 0 4px 15px rgba(46, 125, 50, 0.4); z-index: 100; max-width: none; padding: 0; letter-spacing: 0; transition: all 0.2s; animation: softPulse 3s infinite ease-in-out; }
+.voice-btn:hover { background: #1b5e20; transform: scale(1.1); }
+@keyframes softPulse { 0% { box-shadow: 0 0 0 0 rgba(46, 125, 50, 0.4); } 50% { box-shadow: 0 0 0 10px rgba(46, 125, 50, 0); } 100% { box-shadow: 0 0 0 0 rgba(46, 125, 50, 0); } }
+
+.modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
+.modal-content { background: #fff; padding: 30px; border: 1px solid var(--border-light); width: 300px; text-align: center; border-radius: var(--radius-md); box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+.modal-input { width: 100%; padding: 12px; margin-bottom: 15px; background: var(--input-bg); border: 1px solid var(--border-light); color: var(--text-dark); font-family: inherit; outline: none; box-sizing: border-box; border-radius: var(--radius-md); transition: border-color 0.2s; }
+.modal-input:focus { border-color: var(--primary-green); }
+.btn-auth-submit { width: 100%; padding: 12px; background: var(--primary-green); color: #fff; border: none; font-weight: bold; cursor: pointer; margin-bottom: 10px; font-family: inherit; border-radius: var(--radius-md); font-size: 1rem; transition: background 0.2s; }
+.btn-auth-submit:hover { background: #1b5e20; }
+.btn-auth-cancel { width: 100%; padding: 12px; background: transparent; color: var(--text-muted); border: 1px solid var(--border-light); cursor: pointer; font-family: inherit; border-radius: var(--radius-md); transition: all 0.2s; }
+.btn-auth-cancel:hover { border-color: #e53935; color: #e53935; }
